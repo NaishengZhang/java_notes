@@ -1,4 +1,4 @@
-# java_notes
+### java_notes
 Record Some Basic Java Usage
 
 
@@ -19,4 +19,109 @@ Record Some Basic Java Usage
 | E **[set](https://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html#set-int-E-)**(int index, [E](https://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html) element) | Replaces the element at the specified position in this list with the specified element. |
 | Object[] toArray()                                           |       Returns an array containing all of the elements        |
 | \<T> T[] toArray(T[] a)                                      | Returns an array containing all of the elements in this list in proper sequence |
+
+#### 复杂度震荡
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfrdf1bkhvj30ju08tjsr.jpg)
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfrdf0pyf1j30jt08pq4d.jpg)
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfrdezqgt1j30l908yjsm.jpg)
+
+为了避免addLast完resize之后，紧接着又removeLast，resize，重复执行resize操作，采用一种lazy策略，当size是空间长度的1/4时再resize到1/2的大小。
+
+```java
+    public E remove(int index) {
+        if (index < 0 || index > size) {
+            throw new IllegalArgumentException("get Failed");
+        }
+        E ret = data[index];
+        for (int i = index + 1; i < size; i++) {
+            data[i - 1] = data[i];
+        }
+        size--;
+        data[size] = null; //如果不指定null，那么之前指向的对象一直有引用，就不会被GC。loitering objects.
+        if (size == data.length / 4  && data.length / 2 != 0) { // lazy
+            resize(data.length / 2); // decrease capacity
+        }
+        return ret;
+    }
+```
+
+
+
+
+
+#### Array Copy
+
+1. **System.arraycopy**()
+
+```java
+  	void arraycopy(Object src, int srcPos, Object dest, int destPos, int length);
+
+    public static void main(String[] args) {
+        int[] arr = {0, 1, 2, 3, 4, 5, 6};
+        int[] newArr = new int[15];
+        System.arraycopy(arr, 0, newArr, 1, arr.length);
+        for (int i : newArr) {
+            System.out.print(i);
+        }
+        System.out.println("\n");
+
+        System.arraycopy(arr, 0, arr, 2, 3); 
+        for (int i : arr) {
+            System.out.print(i);
+        }
+    }
+    
+```
+
+2. **Arrays.copyOf() **
+
+```java
+		<T> T[]	copyOf(T[] original, int newLength);
+
+    int[] arr1 = {1, 2, 3, 4, 5};
+    int[] arr2 = Arrays.copyOf(arr1, 5);
+    int[] arr3 = Arrays.copyOf(arr1, 10);
+
+    System.out.print("\narr2:");
+    for (int i : arr2) {
+      System.out.print(i);
+    }
+    System.out.print("\narr3:");
+    for (int i : arr3) {
+      System.out.print(i);
+    }
+```
+
+3. **区别**
+
+- System.arraycopy()可以复制指定的从i到j元
+
+  Arrays.copyOf()则要全部复制。
+
+- System.arraycopy()返回void，要先新建一个数组，然后再复制原组到新的数组。
+
+  Arrays.copyOf()换回T[]，不需要新建一个数组，直接调用方法返回。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
