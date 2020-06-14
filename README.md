@@ -1,4 +1,5 @@
-### java_notes
+# java_notes
+
 Record Some Basic Java Usage
 
 
@@ -105,13 +106,65 @@ Record Some Basic Java Usage
 
   Arrays.copyOf()换回T[]，不需要新建一个数组，直接调用方法返回。
 
+### Queue
+
+#### ArrayQueue
+
+除出队操作时间复杂度是O(n)外，其他操作都是O(1)。
 
 
 
+#### LoopQueue
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfs8d15bf9j30kd0c7ju9.jpg)
 
 
 
+如果不浪费一个空间的话，front == tail既表示队列为空，又表示队列满。
 
+poll出队操作是O(1)
+
+#### Compare ArrayQueue and LoopQueue
+
+```java
+package basic.dataStructure.queue;
+
+import java.util.Random;
+
+public class Main {
+    public static double testQueue(Queue<Integer> q, int opCount) {
+        long startTime = System.nanoTime();
+        Random random = new Random();
+        for (int i = 0; i < opCount; i++) {
+            q.offer(random.nextInt(Integer.MAX_VALUE));
+        }
+
+        for (int i = 0; i < opCount; i++) {
+            q.poll();
+        }
+
+        long endTime = System.nanoTime();
+
+        return (endTime - startTime) / 1000000000.0;
+    }
+
+    public static void main(String[] args) {
+        int opCount = 100000;
+        ArrayQueue<Integer> arrayQueue = new ArrayQueue<>(); // O(n^2)
+        double time1 = testQueue(arrayQueue, opCount);
+        System.out.println("ArrayQueue, time: " + time1 + "s");
+
+        LoopQueue<Integer> loopQueue = new LoopQueue<>(); // O(n)
+        double time2 = testQueue(loopQueue, opCount);
+        System.out.println("LoopQueue, time: " + time2 + "s");
+    }
+}
+```
+
+Result:
+
+ArrayQueue, time: 4.94461159s
+LoopQueue, time: 0.015562913s
 
 
 
