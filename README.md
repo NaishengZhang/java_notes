@@ -166,6 +166,18 @@ Result:
 ArrayQueue, time: 4.94461159s
 LoopQueue, time: 0.015562913s
 
+### LinkedList
+
+#### LinkedListStack
+
+只有head指针，对head进行 增 删 操作复杂度都是O(1)
+
+#### LinkedListQueue
+
+添加为指针的链表
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfsf0gng8dj30kv0cmgn6.jpg)
+
 
 
 

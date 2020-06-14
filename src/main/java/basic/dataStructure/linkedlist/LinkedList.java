@@ -124,6 +124,10 @@ public class LinkedList<E> {
         return retNode.e;
     }
 
+    public E removeFirst() {
+        return remove(0);
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
