@@ -180,13 +180,131 @@ LoopQueue, time: 0.015562913s
 
 
 
+## Generic
+
+ref: Java 泛型 <? super T> 中 super 怎么 理解？与 extends 有何不同？ 
+
+- 胖君的回答 - 知乎 https://www.zhihu.com/question/20400700/answer/117464182
+
+### 为什么要用通配符和边界？**
+
+- Fruit
+
+```java
+public class Fruit {}
+```
+
+- Apple
+
+```java
+public class Apple extends Fruit {}
+```
+
+- Plate
+
+```
+class Plate<T>{
+    private T item;
+    public Plate(T t){item=t;}
+    public void set(T t){item=t;}
+    public T get(){return item;}
+}
+```
+
+Plate 是一个容器，盘子里可以放范型的东西。
+
+水果盘子当然可以装苹果。
+
+```
+Plate<Fruit> p = new Plate<>(new Apple()); 
+// Error: incompatible types: basic.generic.Plate<basic.generic.Apple> cannot be converted to basic.generic.Plate<basic.generic.Fruit>
+```
+
+装苹果的盘子无法被转换为装水果的盘子，对于编译器来说：
+
+- 苹果 IS-A 水果
+- 装苹果的盘子 NOT-IS-A 装水果的盘子
+
+就算容器里装的东西之间有继承关系，但容器之间是没有继承关系的。
+
+所以为了来让“水果盘子”和“苹果盘子”之间发生关系，就创造出 **<? extends T>**和**<? super T>**
+
+### Upper Bounds Wildcards
+
+```java
+Plate<? extends Fruit> p = new Plate<Apple>(new Apple());
+```
+
+一个能放水果以及一切是水果派生类的盘子。
+
+扩展
+
+```java
+//Lev 1
+class Food{}
+
+//Lev 2
+class Fruit extends Food{}
+class Meat extends Food{}
+
+//Lev 3
+class Apple extends Fruit{}
+class Banana extends Fruit{}
+class Pork extends Meat{}
+class Beef extends Meat{}
+
+//Lev 4
+class RedApple extends Apple{}
+class GreenApple extends Apple{}
+```
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfsptnpqe6j317s0l8dlz.jpg)
+
+#### 什么是下界
+
+```java
+Plate<？ super Fruit>
+```
+
+一个能放水果以及一切是水果基类的盘子。
 
 
 
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfsptog9kwj317o0mg43g.jpg)
+
+#### PECS（Producer Extends Consumer Super）原则
+
+- 上界`<? extends Fruit>`不能往里存，只能往外取
+  - 频繁往外读取内容的，适合用上界Extends。
+
+```java
+Plate<? extends Fruit> p=new Plate<Apple>(new Apple());
+	
+//不能存入任何元素
+p.set(new Fruit());    //Error
+p.set(new Apple());    //Error
+
+//读取出来的东西只能存放在Fruit或它的基类里。
+Fruit newFruit1=p.get();
+Object newFruit2=p.get();
+Apple newFruit3=p.get();    //Error
+```
 
 
 
+- 下界<? super T>不影响往里存，但往外取只能放在Object对象里
+  - 经常往里插入的，适合用下界Super。
 
+```java
+Plate<? super Fruit> p=new Plate<Fruit>(new Fruit());
 
+//存入元素正常
+p.set(new Fruit());
+p.set(new Apple());
 
+//读取出来的东西只能存放在Object类里。
+Apple newFruit3=p.get();    //Error
+Fruit newFruit1=p.get();    //Error
+Object newFruit2=p.get();
+```
 

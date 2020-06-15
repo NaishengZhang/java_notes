@@ -20,7 +20,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        int opCount = 1000000;
+        int opCount = 100000;
         ArrayQueue<Integer> arrayQueue = new ArrayQueue<>(); // O(n^2)
         double time1 = testQueue(arrayQueue, opCount);
         System.out.println("ArrayQueue, time: " + time1 + "s");
@@ -28,5 +28,10 @@ public class Main {
         LoopQueue<Integer> loopQueue = new LoopQueue<>(); // O(n)
         double time2 = testQueue(loopQueue, opCount);
         System.out.println("LoopQueue, time: " + time2 + "s");
+
+        LinkedListQueue<Integer> linkedListQueue = new LinkedListQueue<>(); // O(n)
+        double time3 = testQueue(linkedListQueue, opCount);
+        System.out.println("LinkedListQueue, time: " + time3 + " s");
+
     }
 }
