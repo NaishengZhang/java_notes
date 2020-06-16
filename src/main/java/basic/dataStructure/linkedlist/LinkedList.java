@@ -149,4 +149,7 @@ public class LinkedList<E> {
         linkedList.add(2, 666);
         System.out.println(linkedList);
     }
+
+
+
 }

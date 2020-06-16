@@ -51,15 +51,68 @@ Record Some Basic Java Usage
 
 
 
+#### Array <=> List
+
+- **List<Integer> => Integer[] or int[]**
+  - `Arrays.toString(array) `convert T[] to String, help print array.
+
+```java
+List<Integer> list = new ArrayList<>();
+list.add(1);
+list.add(2);
+
+Integer[] array = list.toArray(new Integer[list.size()]);
+// 本身没有提供List<Integer> => int[]的api，但是可以借助stream来转换
+int[] array1 = list.stream().mapToInt(i->i).toArray();
+```
+
+- **List<String> => String[]**
+
+```java
+ArrayList<String> list = new ArrayList<>(2);
+list.add("A");
+list.add("B");
+
+//Convert to string array
+String[] array = list.toArray(new String[list.size()]);
+System.out.println(Arrays.toString(array));
+```
+
+```java
+int[] arr = new int[10];
+System.out.println(Arrays.toString(arr));
+```
+
+- **String[] => List<String>**
+
+```java
+String[] strings = {"a", "b", "c", "d", "e"};
+//Method 1: Arrays
+List<String> slist = Arrays.asList(strings);
+System.out.println(slist);
+
+//Method 2: Collections
+List<String> list1 = new ArrayList<String>();
+Collections.addAll(list1, strings);
+System.out.println(list1);
+
+//Method 3: Iteration
+List<String> list2 = new ArrayList<String>();
+for (String text : strings) {
+    list2.add(text);
+}
+System.out.println(list2);
+```
+
 
 
 #### Array Copy
 
 1. **System.arraycopy**()
 
-```java
-  	void arraycopy(Object src, int srcPos, Object dest, int destPos, int length);
+`void arraycopy(Object src, int srcPos, Object dest, int destPos, int length);`
 
+```java
     public static void main(String[] args) {
         int[] arr = {0, 1, 2, 3, 4, 5, 6};
         int[] newArr = new int[15];
@@ -79,9 +132,9 @@ Record Some Basic Java Usage
 
 2. **Arrays.copyOf() **
 
-```java
-		<T> T[]	copyOf(T[] original, int newLength);
+`<T> T[]	copyOf(T[] original, int newLength);`
 
+```java
     int[] arr1 = {1, 2, 3, 4, 5};
     int[] arr2 = Arrays.copyOf(arr1, 5);
     int[] arr3 = Arrays.copyOf(arr1, 10);
@@ -177,6 +230,40 @@ LoopQueue, time: 0.015562913s
 添加为指针的链表
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfsf0gng8dj30kv0cmgn6.jpg)
+
+### Set
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfsww9s25vj30kr0bhabq.jpg)
+
+
+
+####Complexity Analysis
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfsx0tdq5kj30h60bt408.jpg)
+
+因为在LinkedListSet contains操作需要O(n)，所以本来只需要O(1)的add也需要O(n)。
+
+
+
+- result
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfswvawo6sj309803fweh.jpg)
+
+满二叉树的性质
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfsx32ws3hj30l60cn0v4.jpg)
+
+最后一层的节点个数，是前边所有层之和。
+
+### Map
+
+#### Complexity Analysis
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfukzn59noj318i0q6wno.jpg)
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gful1kszt5j311q0lotfo.jpg)
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gful37a88zj316e0qok0i.jpg)
 
 
 
