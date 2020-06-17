@@ -428,7 +428,17 @@ public E extractMax() {
 
 ### Segment Tree
 
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfvv5ponw0j31cq0pon7r.jpg)
 
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfvv8tc8p0j31ge0t2nc3.jpg)
+
+
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfvoo4t24aj31eo0tcqgu.jpg)
+
+- 可以构造出一个满二叉树，可以用长为大约4n的一位数组存
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfvvy8xc2uj310q0fgn5l.jpg)
 
 
 
