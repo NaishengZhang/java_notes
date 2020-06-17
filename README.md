@@ -1,3 +1,5 @@
+
+
 # java_notes
 
 Record Some Basic Java Usage
@@ -102,6 +104,16 @@ for (String text : strings) {
     list2.add(text);
 }
 System.out.println(list2);
+```
+
+- **int[] => List<Integer>**
+
+There is no shortcut for converting from `int[]` to `List` as `Arrays.asList` does not deal with boxing and will just create a `List` which is not what you want.
+
+```java
+//Java8 Stream
+int[] ints = {1,2,3};
+List<Integer> list = Arrays.stream(ints).boxed().collect(Collectors.toList());
 ```
 
 
@@ -219,6 +231,155 @@ Result:
 ArrayQueue, time: 4.94461159s
 LoopQueue, time: 0.015562913s
 
+### PriorityQueue
+
+- 不同的底层数据结构会影响时间复杂度。
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfuu3mke1ij314c0pqaha.jpg)
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfuuarnyogj31cm0quaol.jpg)
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfv1h4lqajj31fk0ryant.jpg)
+
+- jdk底层也是用的从0开始的数组
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfv1h65czfj31g20s8dud.jpg)
+
+#### Heapify
+
+将任意数组整理成堆的形状
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfv58e2h4xj319q0l0487.jpg)
+
+- 时间复杂度是O(n), 推导https://www.zhihu.com/question/20729324
+
+- heapify的过程：从最后一个非叶子节点开始做siftdown。
+  - 最后一个非叶子节点index就是 (n-1)/2
+
+```java
+public MaxHeap(E[] arr) {
+	data = new Array<>(arr);
+  for (int i = parent(arr.length - 1); i >= 0; i--) {
+    siftDown(i);
+  }
+}
+```
+
+
+
+
+
+#### JDK
+
+默认小顶堆，所以默认是 (i, j) -> (i - j)。i < j, i放在堆顶
+
+```java
+//小顶
+PriorityQueue<Integer> pq = new PriorityQueue<>();
+PriorityQueue<Integer> pq = new PriorityQueue<>((i, j) -> (i - j));
+PriorityQueue<Integer> pq = new PriorityQueue<>(new Comparator<Integer>() {
+    @Override
+    public int compare(Integer o1, Integer o2) {
+        if (o1 - o2 > 0) {
+            return 1;
+        } else if (o1-o2<0) {
+            return -1;
+        } else {
+            return 0;
+        }
+    }
+});
+//简化
+PriorityQueue<Integer> pq = new PriorityQueue<>(new Comparator<Integer>() {
+    @Override
+    public int compare(Integer o1, Integer o2) {
+        return o2 - o1;
+    }
+});
+//大顶
+PriorityQueue<Integer> pq = new PriorityQueue<>((i, j) -> (j - i));
+PriorityQueue<Integer> pq = new PriorityQueue<>(new Comparator<Integer>() {
+    @Override
+    public int compare(Integer o1, Integer o2) {
+        if (o2 - o1 > 0) {
+            return 1;
+        } else if (o2 - o1 < 0) {
+            return -1;
+        } else {
+            return 0;
+        }
+    }
+});
+```
+
+
+
+ 
+
+#### Complexity Analysis
+
+- siftup 
+
+```java
+    public void add(E e) {
+        data.addLast(e);
+        siftUp(data.getSize() - 1);
+    }
+
+    private void siftUp(int k) {
+        while (k > 0 && data.get(parent(k)).compareTo(data.get(k)) < 0) {
+            data.swap(k, parent(k));
+            k = parent(k);
+        }
+    }
+```
+
+- siftdown
+
+```java
+public E extractMax() {
+        E ret = findMax();
+        data.swap(0, data.getSize() - 1);
+        data.removeLast();
+        siftDown(0);
+        return ret;
+    }
+
+    private void siftDown(int k) {
+
+        while (leftChild(k) < data.getSize()) { //一定有做孩子
+            int j = leftChild(k);
+            //有右孩子，并且 右孩子大于⬅左孩子
+            if (j + 1 < data.getSize() && data.get(j + 1).compareTo(data.get(j)) > 0) {
+                j++; // j = right child index
+            }
+            if (data.get(k).compareTo(data.get(j)) >= 0) { // k比左右两个孩子都大或等
+                break;
+            }
+            data.swap(k, j);
+            k = j;
+        }
+    }
+```
+
+#### Example
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfv323vga6j30uu0g2qa2.jpg)
+
+排序 nlogn， 排完之后在取出前100个数
+
+优先队列 nlogm，在这题中，log1000000=20  log100=7，相差三倍。使用优先队列，维护当前看到的m个元素，然后遍历1,000,000剩下的元素，每次和堆顶的元素比较，如果大于堆顶的元素，就将堆顶元素替换，然后siftdown
+
+
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfv2eq4k2bj31cw0rianj.jpg)
+
+
+
+
+
+
+
 ### LinkedList
 
 #### LinkedListStack
@@ -264,6 +425,14 @@ LoopQueue, time: 0.015562913s
 ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gful1kszt5j311q0lotfo.jpg)
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gful37a88zj316e0qok0i.jpg)
+
+### Segment Tree
+
+
+
+
+
+
 
 
 
