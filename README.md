@@ -1,5 +1,3 @@
-
-
 # java_notes
 
 Record Some Basic Java Usage
@@ -436,13 +434,70 @@ public E extractMax() {
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfvoo4t24aj31eo0tcqgu.jpg)
 
-- 可以构造出一个满二叉树，可以用长为大约4n的一位数组存
+#### 数组初始化长度2n or 4n？
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfvvy8xc2uj310q0fgn5l.jpg)
+对于input array： [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+两种不同的初始化方法会产生不同的树。
+
+- **4n自顶向下生成**
+
+tree1: [0, 55, 37, 18, 34, 3, 7, 11, 15, 19, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+```java
+    private void buildTree(int treeIndex, int l, int r, int[] data) {
+        if (l == r) {
+            tree1[treeIndex] = data[l];
+            return;
+        }
+        int leftTreeIndex = 2 * treeIndex + 1;
+        int rightTreeIndex = 2 * treeIndex + 2;
+        int mid = l + (r - l) / 2;
+        buildTree(leftTreeIndex, l, mid, data);
+        buildTree(rightTreeIndex, mid + 1, r, data);
+        tree1[treeIndex] = tree1[leftTreeIndex] + tree1[rightTreeIndex];
+    }
+```
+
+从下图1可以看出来，这种方法会为3 ，4，5留出子节点的空位，以便可以通过2*i或2*i+1访问[6,7]的子节点。图2中可以看到这种方法会造成大量的空间浪费。
+
+图1：![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfvvy8xc2uj310q0fgn5l.jpg)
 
 
 
+图2:![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfvz02lcadj32260lqgvv.jpg)
 
+
+
+- **2n自底向上生成**：build和query很复杂，不推荐。
+
+```java
+    private void buildTree(int[] nums) {
+        int n = nums.length;
+        for (int i = n, j = 0; i < 2 * n; i++, j++) // 先把nums中的元素放到tree最后n位。
+            tree[i] = nums[j];
+        for (int i = n - 1; i > 0; --i) //生成上一层的节点
+            tree[i] = tree[i * 2] + tree[i * 2 + 1];
+    }
+```
+
+tree: [0, 55, 15, 40, 6, 9, 21, 19, 3, 3, 4, 5, 13, 8, 9, 10, 1, 2, 0, 0, 0, 0, 0, 0, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+https://leetcode.com/problems/range-sum-query-mutable/
+
+- 根节点的索引是1
+- 左子树节点的索引为偶数  右子树节点的索引为奇数
+- 叶子节点的索引范围[n, 2n-1]
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfvz03u092j310s0iedk5.jpg)
+
+
+
+nums[i]对应tree[i+n];
+
+如果input array是从1到9，那么tree: [0, 45, 23, 22, 18, 5, 9, 13, 17, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfw00xjmdaj30yk0iyq6x.jpg)
 
 
 
