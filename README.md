@@ -4,7 +4,7 @@ Record Some Basic Java Usage
 
 
 
-## Collection
+## Data Structure
 
 ### ArrayList
 
@@ -498,8 +498,6 @@ nums[i]对应tree[i+n];
 如果input array是从1到9，那么tree: [0, 45, 23, 22, 18, 5, 9, 13, 17, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfw00xjmdaj30yk0iyq6x.jpg)
-
-
 
 ## Generic
 
