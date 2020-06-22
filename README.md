@@ -499,13 +499,27 @@ nums[i]对应tree[i+n];
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfw00xjmdaj30yk0iyq6x.jpg)
 
+## Trie
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg0vhu0hnej31m70u0tzk.jpg)
+
+英文中，最后一个字母并不能唯一确定一个单词，所以需要一个isWord来表示从第一层节点，到目前节点是一个单词
+
+
+
+
+
+
+
+
+
 ## Generic
 
 ref: Java 泛型 <? super T> 中 super 怎么 理解？与 extends 有何不同？ 
 
 - 胖君的回答 - 知乎 https://www.zhihu.com/question/20400700/answer/117464182
 
-### 为什么要用通配符和边界？**
+### 为什么要用通配符和边界？
 
 - Fruit
 

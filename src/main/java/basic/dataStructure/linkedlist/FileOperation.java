@@ -29,8 +29,11 @@ public class FileOperation {
                 scanner = new Scanner(new BufferedInputStream(fis), "UTF-8");
                 scanner.useLocale(Locale.ENGLISH);
             }
-            else
+            else{
+                System.out.println("file not exist");
                 return false;
+            }
+
         }
         catch(IOException ioe){
             System.out.println("Cannot open " + filename);

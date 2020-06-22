@@ -26,14 +26,51 @@ public class Q01Backpack {
             w[i] = sc.nextInt();
             v[i] = sc.nextInt();
         }
-        System.out.println(Arrays.toString(w));
-        System.out.println(Arrays.toString(v));
+        System.out.println("w:" + Arrays.toString(w));
+        System.out.println("v" + Arrays.toString(v));
+//
+//        int[][] memo = new int[N][C + 1];
+//        for (int[] m : memo) {
+//            Arrays.fill(m, -1);
+//        }
+//        System.out.println(knapsack3(w, v, N - 1, C, memo)); // 将从0 - n-1所有物品装入容量为C的背包
+
+//        // 优化空间复杂度 N -> 2
+//        int[][] dp = new int[2][C + 1];
+//        for (int[] m : dp) {
+//            Arrays.fill(m, -1);
+//        }
+//        System.out.println(knapsack4(w, v, N - 1, C, dp)); // 将从0 - n-1所有物品装入容量为C的背包
+
+//        int[] dp = new int[C + 1];
+//        Arrays.fill(dp, -1);
+//        System.out.println(knapsack5(w, v, N - 1, C, dp)); // 将从0 - n-1所有物品装入容量为C的背包
+
 
         int[][] memo = new int[N][C + 1];
         for (int[] m : memo) {
             Arrays.fill(m, -1);
         }
-        System.out.println(knapsack3(w, v, N - 1, C, memo)); // 将从0 - n-1所有物品装入容量为C的背包
+        System.out.println("记忆化搜索");
+        System.out.println("result:" + knapsack2(w, v, N - 1, C, memo)); // 将从0 - n-1所有物品装入容量为C的背包
+        System.out.println("Memo after search:");
+        for (int[] m : memo) {
+            System.out.println(Arrays.toString(m));
+        }
+
+
+        int[][] memo1 = new int[N][C + 1];
+        for (int[] m : memo1) {
+            Arrays.fill(m, -1);
+        }
+        System.out.println("DP");
+        System.out.println("result:" + knapsack3(w, v, N - 1, C, memo1)); // 将从0 - n-1所有物品装入容量为C的背包
+        System.out.println("Memo after search:");
+        for (int[] m : memo1) {
+            System.out.println(Arrays.toString(m));
+        }
+
+
     }
 
     // Solution1, Brute force, time O(n^2), f(index, c) 由index和c组成的对 可能有重复计算。
@@ -83,5 +120,36 @@ public class Q01Backpack {
         return dp[n - 1][c];
     }
 
-    // Solution4, Optimize DP
+    // Solution4, Optimize DP, Space O(2C)
+    private static int knapsack4(int[] w, int[] v, int index, int C, int[][] memo) {
+        int n = w.length;
+        if (n == 0 || C == 0)
+            return 0;
+        for (int j = 0; j <= C; j++)
+            memo[0][j] = (j >= w[0] ? v[0] : 0);
+        for (int i = 1; i < n; i++)
+            for (int j = 0; j <= C; j++) {
+                memo[i % 2][j] = memo[(i - 1) % 2][j];
+                if (j >= w[i])
+                    memo[i % 2][j] = Math.max(memo[i % 2][j], v[i] + memo[(i - 1) % 2][j - w[i]]);
+            }
+
+        return memo[(n - 1) % 2][C];
+    }
+
+    // Solution5, Optimize DP. Space O(C)
+    private static int knapsack5(int[] w, int[] v, int index, int C, int[] memo) {
+        int n = w.length;
+        if (n == 0 || C == 0)
+            return 0;
+        for (int j = 0; j <= C; j++)
+            memo[j] = (j >= w[0] ? v[0] : 0);
+
+        for (int i = 1; i < n; i++)
+            for (int j = C; j >= w[i]; j--) {
+                memo[j] = Math.max(memo[j], v[i] + memo[j - w[i]]);
+
+            }
+        return memo[C];
+    }
 }
