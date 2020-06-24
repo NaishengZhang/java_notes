@@ -77,7 +77,7 @@ public class MaxHeap<E extends Comparable<E>> {
 
     private void siftDown(int k) {
 
-        while (leftChild(k) < data.getSize()) { //一定有做孩子
+        while (leftChild(k) < data.getSize()) { //一定有左孩子
             int j = leftChild(k);
             //有右孩子，并且 右孩子大于⬅左孩子
             if (j + 1 < data.getSize() && data.get(j + 1).compareTo(data.get(j)) > 0) {

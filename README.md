@@ -1,3 +1,5 @@
+
+
 # java_notes
 
 Record Some Basic Java Usage
@@ -499,15 +501,713 @@ nums[i]对应tree[i+n];
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfw00xjmdaj30yk0iyq6x.jpg)
 
-## Trie
+### Trie
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg0vhu0hnej31m70u0tzk.jpg)
 
 英文中，最后一个字母并不能唯一确定一个单词，所以需要一个isWord来表示从第一层节点，到目前节点是一个单词
 
+#### Trie的局限性
+
+假设字符的种数有`m`个，有若干个长度为n的字符串构成了一个 Trie树 ，则每个节点的出度为 `m`（即每个节点的可能子节点数量为`m`），Trie树 的高度为`n`。很明显我们浪费了大量的空间来存储字符，此时Trie树的最坏空间复杂度为`O(m^n)`。也正由于每个节点的出度为`m`，所以我们能够沿着树的一个个分支高效的向下逐个字符的查询，而不是遍历所有的字符串来查询，此时Trie树的最坏时间复杂度为`O(n)`。
+
+Time: O(K) K is the length of word
+
+Space: O(n)
+
+```java
+/*
+iteratively insert
+*/
+class Trie {
+    class Node {
+        private boolean isWord;
+        Node[] child;
+
+        public Node() {
+            isWord = false;
+            child = new Node[26];
+        }
+    }
+
+    private Node root;
+    /** Initialize your data structure here. */
+    public Trie() {
+        root = new Node();
+    }
+    
+    /** Inserts a word into the trie. */
+    public void insert(String word) { // iteration
+        Node cur = root;
+        for (char c : word.toCharArray()) {
+            if (cur.child[c - 'a'] == null) {
+                cur.child[c - 'a'] = new Node();
+            }
+            cur = cur.child[c - 'a'];
+        }
+        cur.isWord = true;
+    }
+    
+    /** Returns if the word is in the trie. */
+    public boolean search(String word) {
+        Node cur = root;
+        for (char c : word.toCharArray()) {
+            cur = cur.child[c - 'a'];
+            if (cur == null) {
+                return false;
+            }
+        }
+        return cur.isWord;
+    }
+    
+    /** Returns if there is any word in the trie that starts with the given prefix. */
+    public boolean startsWith(String prefix) {
+        Node cur = root;
+        for (char c : prefix.toCharArray()) {
+            cur = cur.child[c - 'a'];
+            if (cur == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+```
+
+```java
+recursively insert
+/** Inserts a word into the trie. */
+    public void insert(String word) {
+        insert(word, root, 0);
+    }
+    
+    private void insert(String word, Node cur, int index) { // recursion
+        if (index == word.length()) {
+            cur.isWord = true;
+            return;
+        }
+        char c = word.charAt(index);
+        if (cur.next[c - 'a'] == null) {
+            cur.next[c - 'a'] = new Node();
+        }
+        cur = cur.next[c - 'a'];
+        insert(word, cur, index + 1);
+    }
+    
+```
 
 
 
+### Union-Find
+
+可以回答连接问题，而路径问题会回答多余的信息。
+
+#### Quick Find
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg352q3hvlj30u00i0mzs.jpg)
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg357ty40zj30ve0hs41x.jpg)
+
+union -> O(n)
+
+isConnected(p,q) ->O(1)
+
+```java
+package basic.dataStructure.unionFind;
+
+public class UnionFind implements UF {
+    private int[] id;
+
+    public UnionFind(int size) {
+        id = new int[size];
+        for (int i = 0; i < id.length; i++) {
+            id[i] = i;
+        }
+    }
+
+    // 元素p和q是否属于同一个集合
+    @Override
+    public boolean isConnected(int p, int q) {
+        return find(p) == find(q);
+    }
+
+    @Override
+    public void union(int p, int q) {
+        int pID = find(p);
+        int qID = find(q);
+        if (pID == qID) {
+            return;
+        }
+        for (int i = 0; i < id.length; i++) {
+            if (id[i] == pID) {
+                id[i] = qID;
+            }
+        }
+    }
+
+    private int find(int p) {
+        if (p < 0 && p >= id.length) {
+            throw new IllegalArgumentException("p is out of bound.");
+        }
+        return id[p];
+    }
+
+    @Override
+    public int getSize() {
+        return id.length;
+    }
+}
+
+```
+
+
+
+#### Quick Union
+
+find一直找到parent的root。
+
+union -> O(h) h is the height of the tree
+
+isConnected(p,q) ->O(h)
+
+```java
+public class UnionFind2 implements UF {
+    private int[] parent;
+
+    public UnionFind2(int size) {
+        parent = new int[size];
+        for (int i = 0; i < parent.length; i++) {
+            parent[i] = i;
+        }
+    }
+
+    // 元素p和q是否属于同一个集合
+    @Override
+    public boolean isConnected(int p, int q) {
+        return find(p) == find(q);
+    }
+
+    @Override
+    public void union(int p, int q) {
+        int pRoot = find(p);
+        int qRoot = find(q);
+        if (pRoot == qRoot) {
+            return;
+        }
+        parent[pRoot] =qRoot;
+    }
+
+    // 找p的root
+    private int find(int p) {
+        if (p < 0 && p >= parent.length) {
+            throw new IllegalArgumentException("p is out of bound.");
+        }
+        while (p != parent[p]) {
+            p = parent[p];
+        }
+        return p;
+    }
+
+    @Override
+    public int getSize() {
+        return id.length;
+    }
+}
+```
+
+
+
+#### Compare Quick Find and Quick Union
+
+​							union			isConnected
+
+Quick Find			O(n)					O(1)
+
+Quick Union		O(h)					O(h)	
+
+````java
+package basic.dataStructure.unionFind;
+
+import java.util.Random;
+
+public class Main {
+
+    private static double testUF(UF uf, int m){ //m次操作
+
+        int size = uf.getSize();
+        Random random = new Random();
+
+        long startTime = System.nanoTime();
+
+
+        for(int i = 0 ; i < m ; i ++){
+            int a = random.nextInt(size);
+            int b = random.nextInt(size);
+            uf.union(a, b);
+        }
+
+        for(int i = 0 ; i < m ; i ++){
+            int a = random.nextInt(size);
+            int b = random.nextInt(size);
+            uf.isConnected(a, b);
+        }
+
+        long endTime = System.nanoTime();
+
+        return (endTime - startTime) / 1000000000.0;
+    }
+
+    public static void main(String[] args) {
+
+//         UnionFind1 慢于 UnionFind2
+        int size = 100000;
+        int m = 10000;
+
+        // UnionFind2 慢于 UnionFind1, 但UnionFind3最快
+//        int size = 100000;
+//        int m = 100000;
+
+        UnionFind1 uf1 = new UnionFind1(size);
+        System.out.println("UnionFind1 : " + testUF(uf1, m) + " s");
+
+        UnionFind2 uf2 = new UnionFind2(size);
+        System.out.println("UnionFind2 : " + testUF(uf2, m) + " s");
+
+//        UnionFind3 uf3 = new UnionFind3(size);
+//        System.out.println("UnionFind3 : " + testUF(uf3, m) + " s");
+    }
+}
+````
+
+#### Optimization Based On Size
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg39fn70zhj313h0u0k7n.jpg)
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg39fmbjrkj31380u0qj4.jpg)
+
+通过记录每个根节点下元素的个数，在union的时候，为了减小树的高度，将数量小的连接到数量大的root。
+
+```java
+package basic.dataStructure.unionFind;
+
+// 我们的第三版Union-Find
+public class UnionFind3 implements UF {
+
+    private int[] parent; // parent[i]表示第一个元素所指向的父节点
+    private int[] sz;     // sz[i]表示以i为根的集合中元素个数
+
+    // 构造函数
+    public UnionFind3(int size) {
+
+        parent = new int[size];
+        sz = new int[size];
+
+        // 初始化, 每一个parent[i]指向自己, 表示每一个元素自己自成一个集合
+        for (int i = 0; i < size; i++) {
+            parent[i] = i;
+            sz[i] = 1;
+        }
+    }
+
+    @Override
+    public int getSize() {
+        return parent.length;
+    }
+
+    // 查找过程, 查找元素p所对应的集合编号
+    // O(h)复杂度, h为树的高度
+    private int find(int p) {
+        if (p < 0 || p >= parent.length)
+            throw new IllegalArgumentException("p is out of bound.");
+
+        // 不断去查询自己的父亲节点, 直到到达根节点
+        // 根节点的特点: parent[p] == p
+        while (p != parent[p])
+            p = parent[p];
+        return p;
+    }
+
+    // 查看元素p和元素q是否所属一个集合
+    // O(h)复杂度, h为树的高度
+    @Override
+    public boolean isConnected(int p, int q) {
+        return find(p) == find(q);
+    }
+
+    // 合并元素p和元素q所属的集合
+    // O(h)复杂度, h为树的高度
+    @Override
+    public void union(int p, int q) {
+
+        int pRoot = find(p);
+        int qRoot = find(q);
+
+        if (pRoot == qRoot)
+            return;
+
+        // 根据两个元素所在树的元素个数不同判断合并方向
+        // 将元素个数少的集合合并到元素个数多的集合上
+        if (sz[pRoot] < sz[qRoot]) {
+            parent[pRoot] = qRoot;
+            sz[qRoot] += sz[pRoot];
+        } else { // sz[qRoot] <= sz[pRoot]
+            parent[qRoot] = pRoot;
+            sz[pRoot] += sz[qRoot];
+        }
+    }
+}
+```
+
+#### Optimization Based On Rank
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg39mbmq27j31a90u0k91.jpg)
+
+如果based size， 那8应该链接到7上，但是这样树的高度就会增加。
+
+rank[i]表示根节点为i的树的高度。
+
+改变union的方法
+
+```java
+    public void union(int p, int q) {
+
+        int pRoot = find(p);
+        int qRoot = find(q);
+
+        if (pRoot == qRoot)
+            return;
+
+        // 根据两个元素所在树的元素个数不同判断合并方向
+        // 将元素个数少的集合合并到元素个数多的集合上
+        if (rank[pRoot] < rank[qRoot]) {
+            parent[pRoot] = qRoot;
+            //合并后的树高度不会高于原来的树
+        } else if (rank[pRoot] > rank[qRoot]) {
+            parent[qRoot] = pRoot;
+        } else {
+            parent[qRoot] = pRoot;
+            rank[pRoot] += 1;
+        }
+    }
+```
+
+#### Optimization Path Compression
+
+之前union的时候
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg39zrgk3aj31hk0u0qov.jpg)
+
+- 第一种压缩，路径压缩就是在find的时候，执行`parent[p] = parent[parent[p]];`降低树的高度。
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg3a6wf05yj30r80isgov.jpg)
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg3a6vu751j30ry0io77j.jpg)
+
+```java
+   private int find(int p) {
+        if (p < 0 || p >= parent.length)
+            throw new IllegalArgumentException("p is out of bound.");
+
+        // 不断去查询自己的父亲节点, 直到到达根节点
+        // 根节点的特点: parent[p] == p
+        while (p != parent[p]) {
+            parent[p] = parent[parent[p]];
+            p = parent[p];
+        }
+        return p;
+    }
+```
+
+
+
+- 第二种，最佳压缩是高度为2的树
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg3aejxx3hj31e60u0nks.jpg)
+
+一次find后所有节点都指向根节点
+
+```java
+    private int find(int p) {
+        if (p < 0 || p >= parent.length)
+            throw new IllegalArgumentException("p is out of bound.");
+
+        // 不断去查询自己的父亲节点, 直到到达根节点
+        // 根节点的特点: parent[p] == p
+        if (p != parent[p]) {
+            parent[p] = find(parent[p]);
+        }
+        return parent[p];
+    }
+```
+
+- 其实第一种也可以达到这样的效果，只不过是需要多find几次。
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg3agxypzuj31fj0u04gb.jpg)
+
+之后再find(3)就高度为2
+
+
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg3akauo9vj319y0o2jyy.jpg)
+
+
+
+### AVL
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg3s6yrddwj31640u0kdg.jpg)
+
+二分搜索树，如果按顺序插入，那么就会形成一条链表。BST 插入位置一定是在叶子节点
+
+- **平衡二叉树**
+
+对于任意一个节点，左子树和右子树的高度差不能超过1
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg3scp8jyoj31780u07oa.jpg)
+
+##### 平衡因子
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg3sfu4lp9j31dl0u0nnl.jpg)
+
+##### 未加平衡操作
+
+```java
+    // 获得节点node的高度
+    private int getHeight(Node node) {
+        if (node == null)
+            return 0;
+        return node.height;
+    }
+
+    // 获得节点node的平衡因子
+    private int getBalanceFactor(Node node) {
+        if (node == null)
+            return 0;
+        return getHeight(node.left) - getHeight(node.right);
+    }
+
+		private Node add(Node node, K key, V value) {
+
+        if (node == null) {
+            size++;
+            return new Node(key, value);
+        }
+
+        if (key.compareTo(node.key) < 0)
+            node.left = add(node.left, key, value);
+        else if (key.compareTo(node.key) > 0)
+            node.right = add(node.right, key, value);
+        else // key.compareTo(node.key) == 0
+            node.value = value;
+
+        node.height = 1 + Math.max(getHeight(node.left), getHeight(node.right));
+
+        int balanceFactor = getBalanceFactor(node);
+        if (Math.abs(balanceFactor) > 1) {
+            System.out.println("unbalanced : "+ balanceFactor);
+        }
+        return node;
+    }
+```
+
+
+
+<img src="https://tva1.sinaimg.cn/large/007S8ZIlgy1gg3tbqjzoaj30is18a0yu.jpg" style="zoom:45%;" />
+
+##### 什么时候维护平衡
+
+插入节点可能会导致失去平衡，所以在回溯的时候维护从根到插入节点路径上每个节点平衡性
+
+右图中8不平衡节点
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg3umvt1gtj31g60u01jc.jpg)
+
+
+
+##### 右旋转 LL
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg3ut9oxmtj31j80u0quz.jpg)
+
+
+
+```java
+      // 对节点y进行向右旋转操作，返回旋转后新的根节点x
+    //        y                              x
+    //       / \                           /   \
+    //      x   T4     向右旋转 (y)        z     y
+    //     / \       - - - - - - - ->    / \   / \
+    //    z   T3                       T1  T2 T3 T4
+    //   / \
+    // T1   T2  
+	private Node rightRotate(Node y) {
+        Node x = y.left;
+        Node T3 = x.right;
+        //旋转
+        x.right = y;
+        y.left = T3;
+
+        //更新高度
+        y.height = Math.max(getHeight(y.left), getHeight(y.right)) + 1;
+        x.height = Math.max(getHeight(x.left), getHeight(x.right)) + 1;
+        return x;
+    }
+```
+
+##### 左旋转RR
+
+```java
+    // 对节点y进行向左旋转操作，返回旋转后新的根节点x
+    //    y                             x
+    //  /  \                          /   \
+    // T1   x      向左旋转 (y)       y     z
+    //     / \   - - - - - - - ->   / \   / \
+    //   T2  z                     T1 T2 T3 T4
+    //      / \
+    //     T3 T4
+    private Node leftRotate(Node y) {
+        Node x = y.right;
+        Node T2 = x.left;
+
+        x.left = y;
+        y.right = T2;
+
+        y.height = Math.max(getHeight(y.left), getHeight(y.right)) + 1;
+        x.height = Math.max(getHeight(x.left), getHeight(x.right)) + 1;
+        return x;
+    }
+```
+
+#####LR
+
+插入的节点在左孩子的右侧
+
+<img src="https://tva1.sinaimg.cn/large/007S8ZIlgy1gg46ccy1loj30u010m13d.jpg" style="zoom:25%;" />
+
+对于x进行左旋转，转化成LL
+
+<img src="https://tva1.sinaimg.cn/large/007S8ZIlgy1gg46cc8oopj310q0u0qfu.jpg" style="zoom:25%;" />
+
+
+
+```java
+        // LR
+        if (balanceFactor > 1 && getBalanceFactor(node.left) < 0) {
+            node.left = leftRotate(node.left);
+            return rightRotate(node);
+        }
+```
+
+
+
+##### RL
+
+
+
+<img src="https://tva1.sinaimg.cn/large/007S8ZIlgy1gg46i4kqq3j30u00yf49l.jpg" style="zoom:25%;" />![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg46i3u73oj30u00wj49a.jpg)
+
+
+
+对x进行右旋转，转化成了RR
+
+<img src="https://tva1.sinaimg.cn/large/007S8ZIlgy1gg46i3u73oj30u00wj49a.jpg" style="zoom:25%;" />
+
+```java
+        // RL
+        if (balanceFactor < -1 && getBalanceFactor(node.right) > 0) {
+            node.right = rightRotate(node.right);
+            return leftRotate(node);
+        }
+```
+
+`balanceFactor > 1`用来判断是LL(LR) 还是RR(RL)
+
+`getBalanceFactor(node.left) >= 0`用来判断是ll还是lr
+
+```java
+private Node add(Node node, K key, V value) {
+        if (node == null) {
+            size++;
+            return new Node(key, value);
+        }
+
+        if (key.compareTo(node.key) < 0)
+            node.left = add(node.left, key, value);
+        else if (key.compareTo(node.key) > 0)
+            node.right = add(node.right, key, value);
+        else // key.compareTo(node.key) == 0
+            node.value = value;
+
+        node.height = 1 + Math.max(getHeight(node.left), getHeight(node.right));
+
+        int balanceFactor = getBalanceFactor(node);
+//        if (Math.abs(balanceFactor) > 1) {
+//            System.out.println("unbalanced : " + balanceFactor);
+//        }
+
+        //维护平衡性
+        // 左子树比右子树高 LL getBalanceFactor(node.left)用来判断是ll还是lr
+        if (balanceFactor > 1 && getBalanceFactor(node.left) >= 0) {
+            return rightRotate(node);
+        }
+
+        // 右子树比左子树高 RR
+        if (balanceFactor < -1 && getBalanceFactor(node.right) <= 0) {
+            return leftRotate(node);
+        }
+
+        // LR
+        if (balanceFactor > 1 && getBalanceFactor(node.left) < 0) {
+            node.left = leftRotate(node.left);
+            return rightRotate(node);
+        }
+
+        // RL
+        if (balanceFactor < -1 && getBalanceFactor(node.right) > 0) {
+            node.right = rightRotate(node.right);
+            return leftRotate(node);
+        }
+        return node;
+    }
+    // 对节点y进行向右旋转操作，返回旋转后新的根节点x
+    //        y                              x
+    //       / \                           /   \
+    //      x   T4     向右旋转 (y)        z     y
+    //     / \       - - - - - - - ->    / \   / \
+    //    z   T3                       T1  T2 T3 T4
+    //   / \
+    // T1   T2
+    private Node rightRotate(Node y) {
+        Node x = y.left;
+        Node T3 = x.right;
+        //旋转
+        x.right = y;
+        y.left = T3;
+
+        //更新高度
+        y.height = Math.max(getHeight(y.left), getHeight(y.right)) + 1;
+        x.height = Math.max(getHeight(x.left), getHeight(x.right)) + 1;
+        return x;
+    }
+
+    // 对节点y进行向左旋转操作，返回旋转后新的根节点x
+    //    y                             x
+    //  /  \                          /   \
+    // T1   x      向左旋转 (y)       y     z
+    //     / \   - - - - - - - ->   / \   / \
+    //   T2  z                     T1 T2 T3 T4
+    //      / \
+    //     T3 T4
+    private Node leftRotate(Node y) {
+        Node x = y.right;
+        Node T2 = x.left;
+
+        x.left = y;
+        y.right = T2;
+        y.height = Math.max(getHeight(y.left), getHeight(y.right)) + 1;
+        x.height = Math.max(getHeight(x.left), getHeight(x.right)) + 1;
+
+        return x;
+    }
+```
 
 
 
