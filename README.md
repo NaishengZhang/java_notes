@@ -1021,6 +1021,8 @@ rank[i]表示根节点为i的树的高度。
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg3umvt1gtj31g60u01jc.jpg)
 
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg472ropvyj31f90u0wx1.jpg)
+
 
 
 ##### 右旋转 LL
@@ -1206,6 +1208,125 @@ private Node add(Node node, K key, V value) {
         x.height = Math.max(getHeight(x.left), getHeight(x.right)) + 1;
 
         return x;
+    }
+```
+
+
+
+##### 对比AVL和BST
+
+就按原来随机的顺序添加。
+
+```java
+结果
+Pride and Prejudice
+Total words: 125901
+BST: 0.132611294 s
+AVL: 0.142011275 s
+```
+
+
+
+BST如果按顺序添加，会退化成链表。 所以先`Collections.sort(words)`
+
+```java
+结果
+Pride and Prejudice
+Total words: 125901
+BST: 20.733822689 s
+AVL: 0.071106154 s
+```
+
+##### Remove
+
+递归remove时，先用retNode存储要返回的根节点，在最后对retNode左右子树进行平衡判断 并 处理。
+
+注意这时removeMin改变了树的结构，但是并没有维护平衡，所以两种解决方案：
+
+- 在removeMin中添加平衡的操作。
+- 直接调用remove，删除node.right子树中successor。`successor.right = remove(node.right, successor.key);`
+
+```java
+private Node remove(Node node, K key) {
+
+        if (node == null)
+            return null;
+
+        Node retNode;
+        if (key.compareTo(node.key) < 0) {
+            node.left = remove(node.left, key);
+            // return node;
+            retNode = node;
+        } else if (key.compareTo(node.key) > 0) {
+            node.right = remove(node.right, key);
+            // return node;
+            retNode = node;
+        } else {   // key.compareTo(node.key) == 0
+
+            // 待删除节点左子树为空的情况
+            if (node.left == null) {
+                Node rightNode = node.right;
+                node.right = null;
+                size--;
+                // return rightNode;
+                retNode = rightNode;
+            }
+
+            // 待删除节点右子树为空的情况
+            else if (node.right == null) {
+                Node leftNode = node.left;
+                node.left = null;
+                size--;
+                // return leftNode;
+                retNode = leftNode;
+            }
+
+            // 待删除节点左右子树均不为空的情况
+            else {
+                // 找到比待删除节点大的最小节点, 即待删除节点右子树的最小节点
+                // 用这个节点顶替待删除节点的位置
+                Node successor = minimum(node.right);
+                //successor.right = removeMin(node.right);
+                successor.right = remove(node.right, successor.key);
+                successor.left = node.left;
+
+                node.left = node.right = null;
+
+                // return successor;
+                retNode = successor;
+            }
+        }
+
+        if (retNode == null)
+            return null;
+
+        // 更新height
+        retNode.height = 1 + Math.max(getHeight(retNode.left), getHeight(retNode.right));
+
+        // 计算平衡因子
+        int balanceFactor = getBalanceFactor(retNode);
+
+        // 平衡维护
+        // LL
+        if (balanceFactor > 1 && getBalanceFactor(retNode.left) >= 0)
+            return rightRotate(retNode);
+
+        // RR
+        if (balanceFactor < -1 && getBalanceFactor(retNode.right) <= 0)
+            return leftRotate(retNode);
+
+        // LR
+        if (balanceFactor > 1 && getBalanceFactor(retNode.left) < 0) {
+            retNode.left = leftRotate(retNode.left);
+            return rightRotate(retNode);
+        }
+
+        // RL
+        if (balanceFactor < -1 && getBalanceFactor(retNode.right) > 0) {
+            retNode.right = rightRotate(retNode.right);
+            return leftRotate(retNode);
+        }
+        return retNode;
     }
 ```
 
