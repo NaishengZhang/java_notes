@@ -4,13 +4,13 @@ import java.util.ArrayList;
 
 public class Main {
 
-    private static double testSet(Set<String> set, String filename){
+    private static double testSet(Set<String> set, String filename) {
 
         long startTime = System.nanoTime();
 
         System.out.println(filename);
         ArrayList<String> words = new ArrayList<>();
-        if(FileOperation.readFile(filename, words)) {
+        if (FileOperation.readFile(filename, words)) {
             System.out.println("Total words: " + words.size());
 
             for (String word : words)
@@ -35,6 +35,12 @@ public class Main {
         LinkedListSet<String> linkedListSet = new LinkedListSet<>();
         double time2 = testSet(linkedListSet, filename);
         System.out.println("Linked List Set: " + time2 + " s");
+
+        System.out.println();
+
+        AVLSet<String> avlSet = new AVLSet<>();
+        double time3 = testSet(avlSet, filename);
+        System.out.println("AVL Set : " + time3 + "s");
 
     }
 }
