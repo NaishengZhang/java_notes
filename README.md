@@ -366,9 +366,9 @@ public E extractMax() {
 
 ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfv323vga6j30uu0g2qa2.jpg)
 
-排序 nlogn， 排完之后在取出前100个数
+- 排序 nlogn， 排完之后在取出前100个数
 
-优先队列 nlogm，在这题中，log1000000=20  log100=7，相差三倍。使用优先队列，维护当前看到的m个元素，然后遍历1,000,000剩下的元素，每次和堆顶的元素比较，如果大于堆顶的元素，就将堆顶元素替换，然后siftdown
+- 优先队列 nlogm，在这题中，log1000000=20  log100=7，相差三倍。假设是要找最大的100个数，那么就要用最小堆。使用优先队列，维护当前看到的m个元素，然后遍历1,000,000剩下的元素，每次和堆顶的元素比较，如果大于堆顶的元素，就将堆顶元素替换，然后siftdown 
 
 
 
@@ -1329,6 +1329,106 @@ private Node remove(Node node, K key) {
         return retNode;
     }
 ```
+
+
+
+### Red-Black Tree
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg4fok5i0tj31ix0u0nhv.jpg)
+
+#### 2-3 Tree
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg4fv0lkr3j315a0t848m.jpg)
+
+##### 2-3树如何维持绝对的平衡
+
+参考红皮算法3.3
+
+#### 2-3树与红黑树等价
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg4gdsftkpj30zq0le79c.jpg)
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg4gfy8mw6j311g0mmgtg.jpg)
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg4gpi2v54j31m20u04hc.jpg)
+
+- 3 定义了最后一层(12 18 37 48 88)是叶子结点。
+
+- 在原来2-3树中，任意一个节点到叶子节点的高度是一样的。所以在红黑树中，经过的黑色节点是一样的。也就是说， **红黑树是保持 黑平衡 的二叉树**，严格意义上不是平衡二叉树， 所以红黑树最大高度是2logn。
+
+
+
+### Hash
+
+#### Hashcode
+
+Java中如果一个重写hashcode方法，那么Hashset和Hashmap会调用这个方法来计算hash值，如果没有重写hashcode方法，就会调用Object的hashcode方法，也就是会把对象的内存地址转化为hash值
+
+```java
+package basic.dataStructure.hash;
+
+public class Student {
+
+    int grade;
+    int cls;
+    String firstName;
+    String lastName;
+
+    Student(int grade, int cls, String firstName, String lastName){
+        this.grade = grade;
+        this.cls = cls;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
+    @Override
+    public int hashCode(){
+
+        int B = 31;
+        int hash = 0;
+        hash = hash * B + ((Integer)grade).hashCode();
+        hash = hash * B + ((Integer)cls).hashCode();
+        hash = hash * B + firstName.toLowerCase().hashCode();
+        hash = hash * B + lastName.toLowerCase().hashCode();
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object o){
+
+        if(this == o)
+            return true;
+
+        if(o == null)
+            return false;
+
+        if(getClass() != o.getClass())
+            return false;
+
+        Student another = (Student)o;
+        return this.grade == another.grade &&
+                this.cls == another.cls &&
+                this.firstName.toLowerCase().equals(another.firstName.toLowerCase()) &&
+                this.lastName.toLowerCase().equals(another.lastName.toLowerCase());
+    }
+}
+```
+
+- **如果Hashcode**没有重写，那么以下两个student的hashcode不同;
+- 如果重写了，那么就相同
+
+```java
+Student student = new Student(3, 2, "HaHa", "Zha");
+Student student2 = new Student(3, 2, "HaHa", "Zha");
+```
+
+
+
+#### Solve Collision
+
+##### Separate Chaining 链地址法
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gg4ebqrw56j31f50u0ke0.jpg)
 
 
 
