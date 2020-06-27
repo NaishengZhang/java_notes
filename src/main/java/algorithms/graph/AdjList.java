@@ -1,17 +1,18 @@
 package algorithms.graph;
 
+
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Scanner;
 
-public class AdjMatrix {
+public class AdjList {
 
     private int V; //图中有多少个顶点
     private int E; //图中有多少个边
-    private int[][] adj;
+    private LinkedList<Integer>[] adj;
 
-    public AdjMatrix(String filename) {
+    public AdjList(String filename) {
         File file = new File(filename);
         try {
             Scanner scanner = new Scanner(file);
@@ -24,8 +25,13 @@ public class AdjMatrix {
             if (E < 0) {
                 throw new IllegalArgumentException("E must be non-negative");
             }
+//            adj = new LinkedList<>[V]; // 语法报错
+            // 申请内存空间
+            adj = new LinkedList[V];
+            for (int i = 0; i < V; i++) {
+                adj[i] = new LinkedList<>();
+            }
 
-            adj = new int[V][E];
             for (int i = 0; i < E; i++) {
                 int a = scanner.nextInt();
                 validateVertex(a);
@@ -35,12 +41,12 @@ public class AdjMatrix {
                 if (a == b) {
                     throw new IllegalArgumentException("Self Loop is Detected!"); //自环边
                 }
-                if (adj[a][b] == 1) {
+                if (adj[a].contains(b)) { // O(v)
                     throw new IllegalArgumentException("Parallel Edges are Detected!"); //平行边
                 }
 
-                adj[a][b] = 1;
-                adj[b][a] = 1;
+                adj[a].add(b);
+                adj[b].add(a);
 
             }
         } catch (FileNotFoundException e) {
@@ -48,19 +54,20 @@ public class AdjMatrix {
         }
     }
 
+
+    public LinkedList<Integer> adj(int v) {
+        validateVertex(v);
+        return adj[v];
+    }
+
     public int degree(int v) {
         return adj(v).size();
     }
 
-    public ArrayList<Integer> adj(int v) {
+    public boolean hasEdge(int v, int w) {
         validateVertex(v);
-        ArrayList<Integer> res = new ArrayList<>();
-        for (int i = 0; i < V; i++) {
-            if (adj[v][i] == 1) {
-                res.add(i);
-            }
-        }
-        return res;
+        validateVertex(w);
+        return adj[v].contains(w);
     }
 
     public int V() {
@@ -71,21 +78,16 @@ public class AdjMatrix {
         return E;
     }
 
-    public boolean hasEdge(int v, int w) {
-        validateVertex(v);
-        validateVertex(w);
-        return adj[v][w] == 1;
-    }
-
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
         sb.append(String.format("V = %d, E = %d\n", V, E));
-        for (int i = 0; i < V; i++) {
-            for (int j = 0; j < V; j++)
-                sb.append(String.format("%d ", adj[i][j]));
+        for (int v = 0; v < V; v++) {
+            sb.append(String.format("%d : ", v));
+            for (int w : adj[v])
+                sb.append(String.format("%d ", w));
             sb.append('\n');
         }
         return sb.toString();
@@ -97,8 +99,7 @@ public class AdjMatrix {
     }
 
     public static void main(String[] args) {
-
-        AdjMatrix adjMatrix = new AdjMatrix("src/g.txt");
-        System.out.print(adjMatrix);
+        AdjList adjList = new AdjList("src/g.txt");
+        System.out.print(adjList);
     }
 }
