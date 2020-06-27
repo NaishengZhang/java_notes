@@ -1,4 +1,4 @@
-package algorithms.graph;
+package algorithms.graph.representation;
 
 
 import java.io.File;
