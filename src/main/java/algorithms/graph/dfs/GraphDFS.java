@@ -1,42 +1,54 @@
 package algorithms.graph.dfs;
 
 import algorithms.graph.representation.AdjSet;
+import algorithms.graph.representation.Graph;
 
 import java.util.ArrayList;
 
 public class GraphDFS {
 
-    private AdjSet G;
+    private Graph G;
     private boolean[] visited;
-    private ArrayList<Integer> order = new ArrayList<>();
+    private ArrayList<Integer> pre = new ArrayList<>();
+    private ArrayList<Integer> post = new ArrayList<>();
 
-
-    public GraphDFS(AdjSet G) {
+    public GraphDFS(Graph G) {
 
         this.G = G;
         visited = new boolean[G.V()];
-        dfs(0);
+        // DFS 多个连通分量
+        for (int v = 0; v < G.V(); v++) {
+            if (!visited[v]) {
+                dfs(v);
+            }
+        }
     }
 
     private void dfs(int v) {
 
         visited[v] = true;
-        order.add(v);
+        pre.add(v);
         for (int w : G.adj(v)) {
             if (!visited[w]) {
                 dfs(w);
             }
         }
+        post.add(v);
     }
 
-    public Iterable<Integer> order() {
-        return order;
+    public Iterable<Integer> preOrder() {
+        return pre;
+    }
+
+    public Iterable<Integer> postOrder() {
+        return post;
     }
 
     public static void main(String[] args) {
-        AdjSet g = new AdjSet("src/g.txt");
+        Graph g = new AdjSet("src/g.txt");
         GraphDFS graphDFS = new GraphDFS(g);
-        System.out.println(graphDFS.order());
+        System.out.println(graphDFS.preOrder());
+        System.out.println(graphDFS.postOrder());
     }
 
 }

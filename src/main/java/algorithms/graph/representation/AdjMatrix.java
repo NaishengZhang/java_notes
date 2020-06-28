@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class AdjMatrix {
+public class AdjMatrix implements Graph {
 
     private int V; //图中有多少个顶点
     private int E; //图中有多少个边

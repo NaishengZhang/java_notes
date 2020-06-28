@@ -6,7 +6,7 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.TreeSet;
 
-public class AdjSet {
+public class AdjSet implements Graph {
 
     private int V; //图中有多少个顶点
     private int E; //图中有多少个边
