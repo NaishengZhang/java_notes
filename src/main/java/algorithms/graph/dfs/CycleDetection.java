@@ -19,21 +19,28 @@ public class CycleDetection {
         // DFS 多个连通分量
         for (int v = 0; v < G.V(); v++) {
             if (!visited[v]) {
-                dfs(v, v);
+                if (dfs(v, v)) {
+                    hasCycle = true;
+                    break;
+                }
             }
         }
     }
 
-    private void dfs(int v, int parent) {
+    private boolean dfs(int v, int parent) {
 
         visited[v] = true;
         for (int w : G.adj(v)) {
             if (!visited[w]) {
-                dfs(w, v);
+                if (dfs(w ,v)) {
+                    return true;
+                }
             } else if (w != parent) {
                 hasCycle = true;
+                return true;
             }
         }
+        return false;
     }
 
     public boolean isHasCycle() {
@@ -44,6 +51,10 @@ public class CycleDetection {
         Graph g = new AdjSet("src/g.txt");
         CycleDetection cd = new CycleDetection(g);
         System.out.println(cd.isHasCycle());
+
+        Graph g2 = new AdjSet("src/g2.txt");
+        CycleDetection cd2 = new CycleDetection(g2);
+        System.out.println(cd2.isHasCycle());
     }
 
 }
