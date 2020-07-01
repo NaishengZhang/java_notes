@@ -30,7 +30,7 @@ public class BipartitionDetection {
         }
     }
 
-    private boolean dfs(int v, int color) {
+    private boolean dfs(int v, int color) { // v应该被染成color
         visited[v] = true;
         colors[v] = color;
         for (int w : G.adj(v)) {
