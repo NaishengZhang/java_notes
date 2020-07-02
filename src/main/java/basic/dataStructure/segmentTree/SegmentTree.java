@@ -24,7 +24,6 @@ public class SegmentTree<E> {
         }
         int leftTreeIndex = leftChild(treeIndex);
         int rightTreeIndex = rightChild(treeIndex);
-
         int mid = l + (r - l) / 2;
         buildSegmentTree(leftTreeIndex, l, mid);
         buildSegmentTree(rightTreeIndex, mid + 1, r);
